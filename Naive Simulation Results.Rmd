@@ -1,0 +1,52 @@
+---
+title: "Spicy Burger Roulette"
+author: "Sean Soutar"
+date: "10 December 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Background
+
+Sliders are a great way to sample the tastes of many burgers. They typically come in 3's and are miniature versions of the full meal. 
+
+![](resources/sliders_image.jpg)
+
+I was at a popular burger restaurant with two friends a while ago. On the menu, there was an option to play "Burger Roulette" when you ordered sliders. How it works is that if you order a plate of sliders (3 burgers on a plate), one of them will be loaded with very hot chilis. As a result, the three of us each ordered a different plate of sliders where one burger on each plate was loaded with very hot chilis.
+
+The plan was that we would swap burgers between ourselves randomly as we wanted to taste from each others' selection.
+I thought to myself, what are the chances that I get all three spicy burgers on my plate?
+
+
+## Assumptions
+
+* I presumed that you have absolutely no idea as to which burger contains the chilis. We would be naively swapping burgers.
+
+* There is a strict order of swapping. Player 1 and 2 will exchange burgers, then 2 and 3. Finally, 3 and 1 will swap.
+
+
+## Script Logic
+
+I used the `tidyverse` and `doParallel` packages in conducting the simulation. I start by setting up a parallel cluster and creating the burger swapping index function.
+
+```{r }
+swapping_positions <- function(number,min,max){
+  runif(n = number,min,max) %>% round(digits = 0)
+}
+```
+A uniform random variable is created with a lower and upper bound of min and max. This number is then rounded to an integer. This will be the burger index that player A will choose from player B.
+
+The script will use the `swapping_positions` function to exchange boolean elements between players for a given number of games at a round size (r). An element is `TRUE` when it is a spicy burger. The round size refers to how many swapping rounds there will be per game. If r = 3 , the process as described in the second assumption will be performed 3 times per game.
+
+The script used is available as `spicy_roulette.R`.
+
+
+## Results
+```{r , echo = FALSE}
+long_run_average_plot <- readRDS("simulation_plot.rds")
+long_run_average_plot
+```
+
