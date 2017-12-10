@@ -7,6 +7,7 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
 ## Background
@@ -32,7 +33,7 @@ I thought to myself, what are the chances that I get all three spicy burgers on 
 
 I used the `tidyverse` and `doParallel` packages in conducting the simulation. I start by setting up a parallel cluster and creating the burger swapping index function.
 
-```{r }
+```{r , eval=FALSE}
 swapping_positions <- function(number,min,max){
   runif(n = number,min,max) %>% round(digits = 0)
 }
@@ -46,7 +47,15 @@ The script used is available as `spicy_roulette.R`.
 
 ## Results
 ```{r , echo = FALSE}
-long_run_average_plot <- readRDS("simulation_plot.rds")
-long_run_average_plot
+simulation_with_outliers <- readRDS("plots/simulation_plot_with_outliers.rds")
+simulation_with_outliers
+```
+```{r , echo = FALSE}
+simulation_without_outliers <- readRDS("plots/simulation_plot_without_outliers.rds")
+simulation_without_outliers
+```
+```{r , echo = FALSE}
+simulation_box_plot <- readRDS("plots/simulation_box_plot.rds")
+simulation_box_plot
 ```
 
