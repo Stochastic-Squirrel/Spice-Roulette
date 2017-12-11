@@ -1,5 +1,6 @@
 ---
 title: "Spicy Burger Roulette"
+subtitle: "https://github.com/Stochastic-Squirrel/"
 author: "Sean Soutar"
 date: "10 December 2017"
 output:
