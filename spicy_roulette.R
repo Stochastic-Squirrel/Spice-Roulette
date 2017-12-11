@@ -2,7 +2,7 @@
 
 library(tidyverse)
 library(doParallel)
-library(boot)
+library(ggalt) 
 cores <- 8
 cl <- makeCluster(cores)
 registerDoParallel(cl)
@@ -125,9 +125,10 @@ outlier_simulation <- function(round_size, game_size , R = 1000){
   
 }
 
-outlier_r_16_g_1 <- outlier_simulation(round_size = 16 , game_size = 1 , R= 10000)
-outlier_r_20_g_2 <- outlier_simulation(round_size = 20 , game_size = 2 , R= 10000)
-
+outlier_r_16_g_1 <- outlier_simulation(round_size = 16 , game_size = 1 , R= 20000)
+saveRDS(outlier_r_16_g_1,"results/outlier_r_16_g_1.rds")
+outlier_r_20_g_2 <- outlier_simulation(round_size = 20 , game_size = 2 , R= 20000)
+saveRDS(outlier_r_20_g_2,"results/outlier_r_20_g_2.rds")
 
 
 # Plots ------
@@ -140,7 +141,7 @@ saveRDS(simulation_results ,"results/naive_simulation.rds")
 plotting_with_outliers <- simulation_results #include all game sizes
 
 simulation_plot_with_outliers <- ggplot(plotting_with_outliers) + aes(x = factor(round_number) , y = all_spicy_chance , col = game_size) + scale_color_gradient(low="green",high="red") +
-                  xlab("Round Size") + ylab("% of games where one player had all 3 spicy burgers") + labs(title ="Results with outliers",color ="Game Size") + geom_point(size=5)  
+                  xlab("Round Size") + ylab("% of games where one player had all 3 spicy burgers") + labs(title ="Results with outliers",color ="Game Size") + geom_point(size=5)  + geom_encircle(data = filter(plotting_with_outliers , all_spicy_chance >=50) , aes(x=round_number,y=all_spicy_chance),color = "black" ,size=3 ,expand =0.08)
 simulation_plot_with_outliers
 saveRDS(simulation_plot_with_outliers,"plots/simulation_plot_with_outliers.rds")
 
@@ -175,8 +176,15 @@ line_gamesize_round_number
 
 
 
+# outlier plots
+outlier_plotting_data_1 <- outlier_r_16_g_1 %>% group_by(all_spicy_chance) %>% tally() %>% ungroup() %>%  mutate(relative_frequency = (n*100)/sum(n)) %>% mutate(outlier_description = "Round Size = 16 , Game Size = 1")
+outlier_plotting_data_2 <- outlier_r_20_g_2 %>% group_by(all_spicy_chance) %>% tally() %>% ungroup() %>%  mutate(relative_frequency = (n*100)/sum(n)) %>% mutate(outlier_description = "Round Size = 20 , Game Size = 2")
+outlier_plotting_data <- bind_rows(outlier_plotting_data_1 , outlier_plotting_data_2)
 
-#If i need to play one game????/
 
+outlier_plot_1 <- ggplot(outlier_plotting_data, aes(x=factor(all_spicy_chance) , y = relative_frequency, fill =outlier_description ) ) +geom_bar(stat = "identity" ) +
+  geom_text(aes(label=relative_frequency), vjust=-0.5, color="black", size=3.5 )+
+  theme_minimal() + xlab("% of games played where one player has all three spicy burgers")+ ylab("Relative Frequency (%)")+labs(title = "Distribution Of Outlier Results")+facet_grid(~outlier_description)
+outlier_plot_1
 
-#After what game size do things stablillise?
+saveRDS(outlier_plot_1,"plots/outlier_plot.rds")
